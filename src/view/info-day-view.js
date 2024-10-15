@@ -9,7 +9,7 @@ function createData(pointModel) {
   let textData = '';
 
   if (points.length !== 0) {
-    textData = `${humanizeOrderData(points[0].startDate, FormatTime.TIME_FORMAT_MMM_DD)} &nbsp;&mdash;&nbsp;$ ${humanizeOrderData(points[points.length - 1].endDate, FormatTime.TIME_FORMAT_MMM_DD)}`;
+    textData = `${humanizeOrderData(points[0].startDate, FormatTime.TIME_FORMAT_MMM_DD)} &nbsp;&mdash;&nbsp; ${humanizeOrderData(points[points.length - 1].endDate, FormatTime.TIME_FORMAT_MMM_DD)}`;
   }
   return `
     <p class="trip-info__dates">${textData}</p>

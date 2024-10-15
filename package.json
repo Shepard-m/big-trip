@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint src/",
     "build": "webpack --mode production",
+    "deploy": "npm run build && git add . && git commit -m 'Deploy to GitHub Pages' && git push origin master && git subtree push --prefix build origin gh-pages",
     "start": "webpack serve --mode development --open"
   },
   "browserslist": [
@@ -23,6 +24,7 @@
     "css-loader": "6.8.1",
     "eslint": "8.38.0",
     "eslint-config-htmlacademy": "9.0.0",
+    "gh-pages": "^6.2.0",
     "html-webpack-plugin": "5.5.4",
     "style-loader": "3.3.3",
     "webpack": "5.89.0",
