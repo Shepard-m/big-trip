@@ -1,10 +1,9 @@
-import { UpdateType } from '../const.js';
-import { render } from '../framework/render.js';
-import Observable from '../framework/observable.js';
-import ErrorServerView from '../view/error-server-view.js';
+import { UpdateType } from "../const.js";
+import { render } from "../framework/render.js";
+import Observable from "../framework/observable.js";
+import ErrorServerView from "../view/error-server-view.js";
 
-
-export default class PointModel extends Observable{
+export default class PointModel extends Observable {
   #points = [];
   #offers = [];
   #destinations = [];
@@ -13,29 +12,36 @@ export default class PointModel extends Observable{
   isErrorServer = null;
   #contentContainer = null;
 
-  constructor({pointApiService, contentContainer}) {
+  constructor({ pointApiService, contentContainer }) {
     super();
+
     this.#pointApiService = pointApiService;
     this.#contentContainer = contentContainer;
-
   }
 
-  #adaptToClient(point) { //вопрос
-    const adaptedToClient = {...point,
-      'price': point['base_price'],
-      'startDate': point['date_from'] !== null ? new Date(point['date_from']) : point['date_from'],
-      'endDate': point['date_to'] !== null ? new Date(point['date_to']) : point['date_to'],
-      'typePoint' : point['type'],
-      'isFavourite': point['is_favorite'],
-      'destinationId': point['destination'],
+  #adaptToClient(point) {
+    const adaptedToClient = {
+      ...point,
+      price: point["base_price"],
+      startDate:
+        point["date_from"] !== null
+          ? new Date(point["date_from"])
+          : point["date_from"],
+      endDate:
+        point["date_to"] !== null
+          ? new Date(point["date_to"])
+          : point["date_to"],
+      typePoint: point["type"],
+      isFavourite: point["is_favorite"],
+      destinationId: point["destination"],
     };
 
-    delete adaptedToClient['base_price'];
-    delete adaptedToClient['date_from'];
-    delete adaptedToClient['date_to'];
-    delete adaptedToClient['type'];
-    delete adaptedToClient['is_favorite'];
-    delete adaptedToClient['destination'];
+    delete adaptedToClient["base_price"];
+    delete adaptedToClient["date_from"];
+    delete adaptedToClient["date_to"];
+    delete adaptedToClient["type"];
+    delete adaptedToClient["is_favorite"];
+    delete adaptedToClient["destination"];
 
     return adaptedToClient;
   }
@@ -47,7 +53,7 @@ export default class PointModel extends Observable{
       this.#destinations = await this.#pointApiService.destinations;
       this.#offers = await this.#pointApiService.offers;
       this.isErrorServer = false;
-    } catch(err) {
+    } catch (err) {
       this.#points = [];
       this.#destinations = [];
       this.#offers = [];
@@ -78,7 +84,9 @@ export default class PointModel extends Observable{
 
   getOfferById(type, pointId) {
     const offersType = this.getOfferByType(type);
-    return offersType.offers.filter((item) => pointId.find((id) => item.id === id));
+    return offersType.offers.filter((item) =>
+      pointId.find((id) => item.id === id)
+    );
   }
 
   getDestinationsById(id) {
@@ -91,7 +99,7 @@ export default class PointModel extends Observable{
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error("Can't update unexisting task");
     }
 
     try {
@@ -105,24 +113,20 @@ export default class PointModel extends Observable{
       ];
 
       this._notify(updateType, update);
-    } catch(err) {
-      throw new Error('Can\'t update point');
+    } catch (err) {
+      throw new Error("Can't update point");
     }
-
   }
 
   async addPoints(updateType, update) {
     try {
       const response = await this.#pointApiService.addPoint(update);
       const newPoint = this.#adaptToClient(response);
-      this.#points = [
-        newPoint,
-        ...this.#points,
-      ];
+      this.#points = [newPoint, ...this.#points];
 
       this._notify(updateType, newPoint);
-    } catch(err) {
-      throw new Error('Can\'t add task');
+    } catch (err) {
+      throw new Error("Can't add task");
     }
   }
 
@@ -130,7 +134,7 @@ export default class PointModel extends Observable{
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error("Can't update unexisting task");
     }
 
     try {
@@ -141,8 +145,8 @@ export default class PointModel extends Observable{
       ];
 
       this._notify(updateType, update);
-    } catch(err) {
-      throw new Error('Can\'t delete task');
+    } catch (err) {
+      throw new Error("Can't delete task");
     }
   }
 }
