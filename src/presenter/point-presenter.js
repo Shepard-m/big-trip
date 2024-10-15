@@ -1,13 +1,18 @@
-import EditPointView from '../view/edit-point-view.js';
-import PointView from '../view/point-view.js';
-import AddPointView from '../view/add-new-point-view.js';
-import { UserAction, UpdateType } from '../const.js';
-import { isDatesEqual } from '../utils/date.js';
-import { render, replace, remove, RenderPosition } from '../framework/render.js';
+import EditPointView from "../view/edit-point-view.js";
+import PointView from "../view/point-view.js";
+import AddPointView from "../view/add-new-point-view.js";
+import { UserAction, UpdateType } from "../const.js";
+import { isDatesEqual } from "../utils/date.js";
+import {
+  render,
+  replace,
+  remove,
+  RenderPosition,
+} from "../framework/render.js";
 
 const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
+  DEFAULT: "DEFAULT",
+  EDITING: "EDITING",
 };
 
 export default class PointPresenter {
@@ -28,7 +33,16 @@ export default class PointPresenter {
   #pointData = null;
   #mode = Mode.DEFAULT;
 
-  constructor(containerListPoint, pointModel, onDateChange, onModeChange, noPointComponent, renderNoPoint, filteredPoints, renderContents) {
+  constructor(
+    containerListPoint,
+    pointModel,
+    onDateChange,
+    onModeChange,
+    noPointComponent,
+    renderNoPoint,
+    filteredPoints,
+    renderContents
+  ) {
     this.#containerPoint = containerListPoint;
     this.#pointModel = pointModel;
     this.#handlerChangeData = onDateChange;
@@ -47,7 +61,9 @@ export default class PointPresenter {
 
     this.#pointView = new PointView({
       point: point,
-      checkedOffers: [...this.#pointModel.getOfferById(point.typePoint, point.offers)],
+      checkedOffers: [
+        ...this.#pointModel.getOfferById(point.typePoint, point.offers),
+      ],
       destination: this.#pointModel.getDestinationsById(point.destinationId),
       onEditPointClick: () => {
         this.#handlerSwapEditToPointClick();
@@ -87,7 +103,9 @@ export default class PointPresenter {
   resetView(modePatch) {
     if (this.#addPointView !== null) {
       this.#onClosePointAddClick();
-      const newPointButton = document.querySelector('.trip-main__event-add-btn');
+      const newPointButton = document.querySelector(
+        ".trip-main__event-add-btn"
+      );
       newPointButton.disabled = false;
     }
 
@@ -99,59 +117,60 @@ export default class PointPresenter {
       this.#pointEditView.reset({
         point: this.#pointData,
         offers: [...this.#pointModel.offers],
-        destinations: this.#pointModel.destinations
+        destinations: this.#pointModel.destinations,
       });
       this.#handlerSwapPointToEditClick();
     }
-
-
   }
 
   #handlerSwapEditToPointClick() {
     replace(this.#pointEditView, this.#pointView);
     this.#handlerModeChange();
     this.#mode = Mode.EDITING;
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener("keydown", this.#escKeyDownHandler);
   }
 
   #handlerSwapPointToEditClick() {
     this.#pointEditView.reset({
       point: this.#pointData,
       offers: [...this.#pointModel.offers],
-      destinations: this.#pointModel.destinations
+      destinations: this.#pointModel.destinations,
     });
     replace(this.#pointView, this.#pointEditView);
     this.#mode = Mode.DEFAULT;
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener("keydown", this.#escKeyDownHandler);
   }
 
   #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
+    if (evt.key === "Escape") {
       evt.preventDefault();
       this.#pointEditView.reset({
         point: this.#pointData,
         offers: [...this.#pointModel.offers],
-        destinations: this.#pointModel.destinations
+        destinations: this.#pointModel.destinations,
       });
       this.#handlerSwapPointToEditClick();
     }
   };
 
   #escCloseNewPointHandler = (evt) => {
-    if (evt.key === 'Escape') {
-      const newPointButton = document.querySelector('.trip-main__event-add-btn');
+    if (evt.key === "Escape") {
+      const newPointButton = document.querySelector(
+        ".trip-main__event-add-btn"
+      );
       newPointButton.disabled = false;
-      document.removeEventListener('keydown', this.#escCloseNewPointHandler);
+      document.removeEventListener("keydown", this.#escCloseNewPointHandler);
       this.#onClosePointAddClick();
     }
   };
 
-  //handlers
   #handlerFormEditSubmit = (update) => {
-    const coincidenceTime = isDatesEqual(this.#pointData.startDate, update.startDate) && isDatesEqual(this.#pointData.endDate, update.endDate);
+    const coincidenceTime =
+      isDatesEqual(this.#pointData.startDate, update.startDate) &&
+      isDatesEqual(this.#pointData.endDate, update.endDate);
     const coincidencePrice = this.#pointData.price === update.price;
 
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener("keydown", this.#escKeyDownHandler);
     this.#handlerChangeData(
       UserAction.UPDATE_POINT,
       coincidenceTime && coincidencePrice ? UpdateType.PATCH : UpdateType.MINOR,
@@ -160,24 +179,19 @@ export default class PointPresenter {
   };
 
   #handlerFormDeleteEditSubmit = (point) => {
-    this.#handlerChangeData(
-      UserAction.DELETE_POINT,
-      UpdateType.MINOR,
-      point
-    );
+    this.#handlerChangeData(UserAction.DELETE_POINT, UpdateType.MINOR, point);
   };
 
   #handlerCloseEdit = () => {
     this.#handlerSwapPointToEditClick();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener("keydown", this.#escKeyDownHandler);
   };
 
   #handlerChangeFavoriteClick = () => {
-    this.#handlerChangeData(
-      UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
-      {...this.#pointData, isFavourite: !this.#pointData.isFavourite}
-    );
+    this.#handlerChangeData(UserAction.UPDATE_POINT, UpdateType.MINOR, {
+      ...this.#pointData,
+      isFavourite: !this.#pointData.isFavourite,
+    });
   };
 
   destroy() {
@@ -203,8 +217,12 @@ export default class PointPresenter {
         handlerClosePointClick: this.#onClosePointAddClick,
         onFormSubmit: this.#onSaveNewPointSubmit,
       });
-      document.addEventListener('keydown', this.#escCloseNewPointHandler);
-      render(this.#addPointView, this.#containerPoint, RenderPosition.AFTERBEGIN);
+      document.addEventListener("keydown", this.#escCloseNewPointHandler);
+      render(
+        this.#addPointView,
+        this.#containerPoint,
+        RenderPosition.AFTERBEGIN
+      );
     }
   };
 
@@ -213,7 +231,7 @@ export default class PointPresenter {
       this.#pointView.shake();
       return;
     }
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener("keydown", this.#escKeyDownHandler);
     const resetFormState = () => {
       this.#pointEditView.updateElement({
         isDisabled: false,
@@ -227,7 +245,7 @@ export default class PointPresenter {
 
   setAbortingNewPoint() {
     this.#addPointView.shake();
-    document.addEventListener('keydown', this.#escCloseNewPointHandler);
+    document.addEventListener("keydown", this.#escCloseNewPointHandler);
     const resetFormState = () => {
       this.#addPointView.updateElement({
         isDisabled: false,
@@ -240,8 +258,8 @@ export default class PointPresenter {
 
   setSavingEditPoint() {
     if (this.#mode === Mode.EDITING) {
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
-      document.removeEventListener('keydown', this.#escCloseNewPointHandler);
+      document.removeEventListener("keydown", this.#escKeyDownHandler);
+      document.removeEventListener("keydown", this.#escCloseNewPointHandler);
       this.#pointEditView.updateElement({
         isDisabled: true,
         isSaving: true,
@@ -250,8 +268,8 @@ export default class PointPresenter {
   }
 
   setSavingNewPoint() {
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    document.removeEventListener('keydown', this.#escCloseNewPointHandler);
+    document.removeEventListener("keydown", this.#escKeyDownHandler);
+    document.removeEventListener("keydown", this.#escCloseNewPointHandler);
     this.#addPointView.updateElement({
       isDisabled: true,
       isSaving: true,
@@ -259,8 +277,8 @@ export default class PointPresenter {
   }
 
   setDeleting() {
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    document.removeEventListener('keydown', this.#escCloseNewPointHandler);
+    document.removeEventListener("keydown", this.#escKeyDownHandler);
+    document.removeEventListener("keydown", this.#escCloseNewPointHandler);
     if (this.#mode === Mode.EDITING) {
       this.#pointEditView.updateElement({
         isDisabled: true,
@@ -270,15 +288,18 @@ export default class PointPresenter {
   }
 
   #onClosePointAddClick = () => {
-    document.removeEventListener('keydown', this.#escCloseNewPointHandler);
+    document.removeEventListener("keydown", this.#escCloseNewPointHandler);
     this.#addPointView.reset({
       offers: [...this.#pointModel.offers],
-      destinations: this.#pointModel.destinations
+      destinations: this.#pointModel.destinations,
     });
     remove(this.#addPointView);
     this.#addPointView = null;
 
-    if (this.#pointModel.points.length !== 0 && this.#filteredPoints?.length === 0) {
+    if (
+      this.#pointModel.points.length !== 0 &&
+      this.#filteredPoints?.length === 0
+    ) {
       this.#renderContents();
       return;
     }
@@ -289,10 +310,6 @@ export default class PointPresenter {
   };
 
   #onSaveNewPointSubmit = (point) => {
-    this.#handlerChangeData(
-      UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      point,
-    );
+    this.#handlerChangeData(UserAction.ADD_POINT, UpdateType.MINOR, point);
   };
 }
